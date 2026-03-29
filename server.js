@@ -1,7 +1,21 @@
 const express = require('express');
 const path = require('path');
 const https = require('https');
+const fs = require('fs');
 const { runCron, setSubscriptions, getSubscriptions } = require('./cron');
+const { sendConfirmation } = require('./notify');
+
+const SAVINGS_FILE = path.join(__dirname, 'data/savings.json');
+const TICKET_PRICE = 90;
+
+function loadSavings() {
+  try { return JSON.parse(fs.readFileSync(SAVINGS_FILE, 'utf8')); }
+  catch(e) { return { saves: 0, totalSaved: 0, log: [] }; }
+}
+
+function writeSavings(data) {
+  fs.writeFileSync(SAVINGS_FILE, JSON.stringify(data, null, 2));
+}
 
 const app = express();
 const PORT = process.env.PORT || 3459;
@@ -280,7 +294,77 @@ app.post('/api/subscribe', (req, res) => {
   const sub = { street, address, contact, type, token, active: true, created: new Date().toISOString() };
   subscriptions.push(sub);
   setSubscriptions(subscriptions);
+  // Fire confirmation email async (don't block response)
+  if (type === 'email') {
+    sendConfirmation(sub).catch(e => console.error('Confirmation send error:', e));
+  }
   res.json({ success: true, token });
+});
+
+// ── SAVINGS ───────────────────────────────────────────────────────────────────
+app.get('/api/savings', (req, res) => {
+  const data = loadSavings();
+  res.json({ saves: data.saves, totalSaved: data.totalSaved });
+});
+
+// ── FEEDBACK ─────────────────────────────────────────────────────────────────
+app.get('/api/feedback', (req, res) => {
+  const { token } = req.query;
+
+  // Find subscriber by token
+  const sub = subscriptions.find(s => s.token === token);
+
+  // Log the save regardless (could be test or valid token)
+  const data = loadSavings();
+
+  // Deduplicate: each token can only save once
+  const alreadySaved = data.log.some(e => e.token === token);
+  if (!alreadySaved) {
+    data.saves += 1;
+    data.totalSaved += TICKET_PRICE;
+    data.log.push({
+      token: token || 'unknown',
+      street: sub?.street || 'unknown',
+      savedAt: new Date().toISOString()
+    });
+    writeSavings(data);
+  }
+
+  const already = alreadySaved ? `<p style="font-size:14px;color:#64748B;margin-top:8px;">You already logged this one — but we count it!</p>` : '';
+
+  res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Nice! — Street Sweeper SF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Inter',system-ui,sans-serif;background:#F8FAFC;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+      .card{background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);max-width:420px;width:100%;overflow:hidden}
+      .top{background:#2563EB;padding:32px;text-align:center}
+      .top .icon{font-size:48px;margin-bottom:12px}
+      .top h1{font-size:26px;font-weight:900;color:#fff;letter-spacing:-0.02em}
+      .body{padding:28px 32px}
+      .amount{font-size:40px;font-weight:900;color:#2563EB;letter-spacing:-0.03em;margin:8px 0 4px}
+      .label{font-size:14px;color:#64748B;margin-bottom:20px}
+      .body p{font-size:15px;color:#475569;line-height:1.6}
+      .home-link{display:inline-block;margin-top:20px;padding:12px 24px;background:#2563EB;color:#fff;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="top">
+        <div class="icon">🚗</div>
+        <h1>Ticket dodged!</h1>
+      </div>
+      <div class="body">
+        <div class="amount">$${data.totalSaved.toLocaleString()}</div>
+        <div class="label">saved by Street Sweeper SF users so far</div>
+        <p>Thanks for letting us know. Every save counts${sub?.street ? ` — especially on ${sub.street}` : ''}.</p>
+        ${already}
+        <a class="home-link" href="/">Back to Street Sweeper SF</a>
+      </div>
+    </div>
+  </body></html>`);
 });
 
 // ── CRON ENDPOINT (called by Vercel Cron every 30 min) ────────────────────────

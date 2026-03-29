@@ -462,6 +462,30 @@
     .rate-btn.bad { border-color: var(--red); color: var(--red); }
     .rate-btn.bad:hover { background: var(--red); color: #fff; }
 
+    /* ── SAVINGS BANNER ── */
+    .savings-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 100px;
+      padding: 10px 22px;
+      margin-bottom: 32px;
+    }
+    .savings-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.01em;
+    }
+    .savings-amount {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
     @media (max-width: 600px) {
       .schedule-cards { grid-template-columns: 1fr; }
       .steps { grid-template-columns: 1fr; }
@@ -491,6 +515,11 @@
 
   <h1>Street Sweeper SF</h1>
   <p>Enter a San Francisco location and we'll text or email you 1 hour before a street cleaning — every week, automatically.</p>
+
+  <div class="savings-banner">
+    <span class="savings-label">Tickets dodged so far</span>
+    <span class="savings-amount" id="savings-amount">$0</span>
+  </div>
 
   <div class="search-card">
     <label class="search-label" for="address-input" style="display:none"></label>
@@ -555,6 +584,7 @@
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">About This Site</div>
     <div class="modal-body">
+      <p>Hello, is it <a href="https://www.blakecross.io" target="_blank" style="color:var(--blue);font-weight:600;">Blake</a> you're looking for?</p>
       <br>
       <p>Schedule data is sourced from <a href="https://sfpublicworks.org/services/mechanical-street-sweeping-and-street-cleaning-schedule" target="_blank" style="color:var(--blue)">SF Public Works</a> published routes. Notifications are opt-in and you can unsubscribe at any time via link in any reminder.</p>
       <br>
@@ -563,6 +593,29 @@
 </div>
 
 <script>
+  // ── SAVINGS COUNTER ──────────────────────────────────────────────────────────
+  async function loadSavings() {
+    try {
+      const res = await fetch('/api/savings');
+      const data = await res.json();
+      const el = document.getElementById('savings-amount');
+      if (!el) return;
+      const target = data.totalSaved || 0;
+      if (target === 0) { el.textContent = '$0'; return; }
+      // Animate count up
+      const duration = 1000;
+      const start = performance.now();
+      function tick(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = '$' + Math.round(eased * target).toLocaleString();
+        if (progress < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    } catch(e) {}
+  }
+  loadSavings();
+
   let currentStreet = '';
   let currentAddress = '';
   function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
@@ -591,8 +644,8 @@
       <div class="schedule-cards">${cardsHtml}</div>
       <div class="subscribe-section">
         <h3>Get reminded 1 hour before a street cleaning</h3>
-        <p>We'll ping you automatically before every street cleaning.</p>
-        <input id="contact-input" class="contact-input" type="text" placeholder="e.g. (415) 555-0123 or clawonvacation@gmail.com" autocomplete="off">
+        <p>We'll email you automatically before every street cleaning.</p>
+        <input id="contact-input" class="contact-input" type="text" placeholder="e.g. clawonvacation@gmail.com" autocomplete="off">
         <button class="sub-btn" onclick="subscribe()">Remind Me</button>
         <div id="sub-result"></div>
         <p class="sub-legal">You can unsubscribe anytime.</p>
@@ -695,13 +748,13 @@
 
         <div class="subscribe-section">
           <h3>Get reminded 1 hour before a street cleaning</h3>
-          <p>We'll ping you automatically before every street cleaning.</p>
+          <p>We'll email you automatically before every street cleaning.</p>
 
           <input
             id="contact-input"
             class="contact-input"
             type="text"
-            placeholder="e.g. (415) 555-0123 or clawonvacation@gmail.com"
+            placeholder="e.g. clawonvacation@gmail.com"
             autocomplete="off"
           >
 

@@ -1,3 +1,4 @@
 node_modules/
 subscriptions.db
 .vercel/
+.vercel
