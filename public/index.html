@@ -541,10 +541,10 @@
 <div class="modal-overlay" id="modal-rate" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">Rate This Site</div>
+    <div class="modal-title">Feedback Me!</div>
     <div class="rate-btns">
-      <a class="rate-btn" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Saved%20me%20a%20ticket!&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Saved%20me%20a%20ticket!">Saved Me a Ticket 🎉</a>
-      <a class="rate-btn bad" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Got%20swept%20anyway&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Got%20swept%20anyway.">Got Swept Anyway 😩</a>
+      <a class="rate-btn" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Saved%20me%20a%20ticket!&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Saved%20me%20a%20ticket!">Saved Me a Ticket</a>
+      <a class="rate-btn bad" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Got%20swept%20anyway&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Got%20swept%20anyway.">Got Swept Anyway</a>
     </div>
   </div>
 </div>
@@ -555,11 +555,9 @@
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">About This Site</div>
     <div class="modal-body">
-      <p><strong>Don't Get Swept</strong> is a free SF street sweeping reminder service. Enter your address, see your sweeping schedule, and sign up for reminders 1 hour before cleaning starts.</p>
       <br>
       <p>Schedule data is sourced from <a href="https://sfpublicworks.org/services/mechanical-street-sweeping-and-street-cleaning-schedule" target="_blank" style="color:var(--blue)">SF Public Works</a> published routes. Notifications are opt-in and you can unsubscribe at any time via link in any reminder.</p>
       <br>
-      <p><strong>SMS and email notifications</strong> are coming soon — sign up now and we'll activate them for your address automatically.</p>
     </div>
   </div>
 </div>
@@ -597,7 +595,7 @@
         <input id="contact-input" class="contact-input" type="text" placeholder="e.g. (415) 555-0123 or clawonvacation@gmail.com" autocomplete="off">
         <button class="sub-btn" onclick="subscribe()">Remind Me</button>
         <div id="sub-result"></div>
-        <p class="sub-legal">Your contact info is used only to send you reminders. We will never sell your data. Reply STOP or click unsubscribe to cancel anytime.</p>
+        <p class="sub-legal">You can unsubscribe anytime.</p>
       </div>`;
     resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -709,7 +707,7 @@
 
           <button class="sub-btn" onclick="subscribe()">Remind Me</button>
           <div id="sub-result"></div>
-          <p class="sub-legal">Your contact info is used only to send you reminders. We will never sell your data. Reply STOP or click unsubscribe to cancel anytime.</p>
+          <p class="sub-legal">You can unsubscribe anytime.</p>
         </div>
       `;
 

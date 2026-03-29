@@ -59,7 +59,6 @@ function buildEmail({ street, side, day, fromTime, toTime, unsubscribeUrl }) {
             <tr>
               <td><p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;">
                 You signed up at <a href="${BASE_URL}" style="color:#2563EB;text-decoration:none;">sweeping.blakecross.io</a>.<br>
-                Your data is never sold. Ever.
               </p></td>
               <td align="right" valign="middle" style="white-space:nowrap;padding-left:16px;">
                 <a href="${unsubscribeUrl}" style="font-size:12px;color:#94A3B8;text-decoration:underline;">Unsubscribe</a>
