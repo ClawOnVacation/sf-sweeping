@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Street Sweeper SF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563EB;
+      --blue-dark: #1D4ED8;
+      --blue-light: #EFF6FF;
+      --yellow: #FEF08A;
+      --yellow-dark: #CA8A04;
+      --white: #FFFFFF;
+      --off: #F8FAFC;
+      --gray: #64748B;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --red: #DC2626;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--off);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--blue);
+      padding: 80px 24px 64px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-icon {
+      font-size: 52px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 300;
+      color: rgba(255,255,255,0.8);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    /* ── SEARCH BOX ── */
+    .search-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 560px;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .search-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-row input {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-row input:focus { border-color: var(--blue); }
+    .search-row input::placeholder { color: #94A3B8; }
+
+    .search-row button {
+      padding: 13px 22px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-row button:hover { background: var(--blue-dark); }
+    .search-row button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── RESULTS ── */
+    .results {
+      max-width: 640px;
+      margin: 48px auto 0;
+      padding: 0 24px;
+    }
+
+    .result-address {
+      font-size: 13px;
+      color: var(--gray);
+      text-align: center;
+      padding: 0 0 4px;
+      letter-spacing: 0.01em;
+    }
+
+    .result-street {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray);
+      margin-bottom: 16px;
+      text-align: center;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .schedule-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .sched-card {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .sched-card:hover { border-color: var(--blue); box-shadow: 0 4px 20px rgba(37,99,235,0.08); }
+
+    .sched-side {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: var(--blue-light);
+      padding: 4px 10px;
+      border-radius: 100px;
+      margin-bottom: 12px;
+    }
+
+    .sched-day {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .sched-time {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .sched-freq {
+      font-size: 12px;
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    /* Next sweep countdown */
+    .next-sweep {
+      background: var(--yellow);
+      border: 1.5px solid var(--yellow-dark);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .next-sweep-icon { font-size: 24px; flex-shrink: 0; }
+    .next-sweep-text { font-size: 14px; font-weight: 500; color: #713F12; line-height: 1.5; }
+    .next-sweep-text strong { color: #431407; }
+
+    /* Not found */
+    .not-found {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      text-align: center;
+    }
+    .not-found p { font-size: 15px; color: var(--gray); line-height: 1.6; }
+    .not-found a { color: var(--blue); text-decoration: none; font-weight: 500; }
+
+    /* ── SUBSCRIBE SECTION ── */
+    .subscribe-section {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 60px;
+    }
+
+    .subscribe-section h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .subscribe-section p {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .contact-type {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .type-btn {
+      flex: 1;
+      padding: 11px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--gray);
+    }
+    .type-btn.active {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .contact-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+    .contact-input:focus { border-color: var(--blue); }
+
+    .sub-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sub-btn:hover { background: var(--blue-dark); }
+    .sub-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .sub-success {
+      background: #F0FDF4;
+      border: 1.5px solid #86EFAC;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #166534;
+    }
+
+    .sub-legal {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    /* ── LOCATION PICKER ── */
+    .picker-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .picker-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .picker-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 16px 20px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .picker-btn:hover {
+      border-color: var(--blue);
+      box-shadow: 0 2px 12px rgba(37,99,235,0.08);
+    }
+    .picker-name { flex: 1; }
+
+    /* ── HOW IT WORKS ── */
+    .how-it-works {
+      max-width: 640px;
+      margin: 0 auto 60px;
+      padding: 60px 24px 0;
+    }
+    .how-it-works h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+      letter-spacing: -0.02em;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .step {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 auto 12px;
+    }
+    .step h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .step p { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 12px;
+      color: var(--gray);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--blue); text-decoration: none; }
+
+    /* ── NAV ICONS ── */
+    .nav-icons {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      display: flex;
+      gap: 16px;
+    }
+    .nav-icon {
+      color: rgba(255,255,255,0.75);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      display: flex;
+      transition: color 0.2s;
+    }
+    .nav-icon:hover { color: #fff; }
+    .nav-icon svg { width: 18px; height: 18px; }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 90%;
+      padding: 36px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 20px;
+      background: none; border: none; font-size: 18px; color: var(--gray); cursor: pointer;
+    }
+    .modal-title {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 16px;
+    }
+    .modal-body { font-size: 14px; color: var(--gray); line-height: 1.7; }
+    .modal-body strong { color: var(--text); }
+    .rate-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .rate-btn {
+      display: block; padding: 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 13px;
+      font-weight: 600; text-decoration: none; text-align: center; color: var(--text);
+      transition: all 0.15s; cursor: pointer;
+    }
+    .rate-btn:hover { background: var(--text); color: #fff; }
+    .rate-btn.bad { border-color: var(--red); color: var(--red); }
+    .rate-btn.bad:hover { background: var(--red); color: #fff; }
+
+    @media (max-width: 600px) {
+      .schedule-cards { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .search-row { flex-direction: column; }
+      .search-row button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <nav class="nav-icons">
+    <a class="nav-icon" href="mailto:clawonvacation@gmail.com" title="Contact">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+    </a>
+    <a class="nav-icon" href="https://www.instagram.com/moltbod/" target="_blank" title="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <button class="nav-icon" onclick="openModal('rate')" title="Rate this site">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </button>
+    <button class="nav-icon" onclick="openModal('info')" title="About">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8.5"/><line x1="12" y1="11" x2="12" y2="17"/></svg>
+    </button>
+  </nav>
+
+  <h1>Street Sweeper SF</h1>
+  <p>Enter a San Francisco location and we'll text or email you 1 hour before a street cleaning — every week, automatically.</p>
+
+  <div class="search-card">
+    <label class="search-label" for="address-input" style="display:none"></label>
+    <div class="search-row">
+      <input
+        id="address-input"
+        type="text"
+        placeholder="e.g. 2000 Mission St or Tartine Bakery"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')lookup()"
+      >
+      <button onclick="lookup()" id="lookup-btn">Look Up</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<div class="results" id="results" style="display:none"></div>
+
+<!-- HOW IT WORKS -->
+<div class="how-it-works" id="how-it-works">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h4>Enter where you parked</h4>
+      <p>It can be an address or business.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h4>See your schedule</h4>
+      <p>View street cleaning days for both sides of your street.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h4>Get reminded</h4>
+      <p>Receive a text or email 1 hour before a street cleaning. Unsubscribe anytime.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  Schedule data from <a href="https://sfpublicworks.org/services/mechanical-street-sweeping-and-street-cleaning-schedule" target="_blank">SF Public Works</a>
+</footer>
+
+<!-- RATE MODAL -->
+<div class="modal-overlay" id="modal-rate" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">Rate This Site</div>
+    <div class="rate-btns">
+      <a class="rate-btn" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Saved%20me%20a%20ticket!&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Saved%20me%20a%20ticket!">Saved Me a Ticket 🎉</a>
+      <a class="rate-btn bad" href="mailto:clawonvacation@gmail.com?subject=Don't%20Get%20Swept%20%E2%80%94%20Got%20swept%20anyway&body=I%20rated%20Don%27t%20Get%20Swept%3A%20Got%20swept%20anyway.">Got Swept Anyway 😩</a>
+    </div>
+  </div>
+</div>
+
+<!-- INFO MODAL -->
+<div class="modal-overlay" id="modal-info" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">About This Site</div>
+    <div class="modal-body">
+      <p><strong>Don't Get Swept</strong> is a free SF street sweeping reminder service. Enter your address, see your sweeping schedule, and sign up for reminders 1 hour before cleaning starts.</p>
+      <br>
+      <p>Schedule data is sourced from <a href="https://sfpublicworks.org/services/mechanical-street-sweeping-and-street-cleaning-schedule" target="_blank" style="color:var(--blue)">SF Public Works</a> published routes. Notifications are opt-in and you can unsubscribe at any time via link in any reminder.</p>
+      <br>
+      <p><strong>SMS and email notifications</strong> are coming soon — sign up now and we'll activate them for your address automatically.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStreet = '';
+  let currentAddress = '';
+  function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
+  function closeModal() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  async function pickLocation(encodedStreet, encodedMatched, isBiz) {
+    const street = decodeURIComponent(encodedStreet);
+    const matched = decodeURIComponent(encodedMatched);
+    const res = await fetch(`/api/lookup?street=${encodedStreet}&matched=${encodedMatched}&isBusiness=${isBiz}`);
+    const data = await res.json();
+    const resultsEl = document.getElementById('results');
+    currentStreet = data.street || street;
+    currentAddress = data.matched || matched;
+    if (!data.found || !data.schedule) {
+      resultsEl.innerHTML = `<div class="not-found"><p>We don't have the sweeping schedule for <strong>${street}</strong> yet.<br><br><a href="mailto:clawonvacation@gmail.com?subject=Add%20my%20street&body=Please%20add%20${encodedStreet}">Email us</a> and we'll add it.</p></div>`;
+      return;
+    }
+    const cardsHtml = data.schedule.map(s => `
+      <div class="sched-card">
+        <div class="sched-side"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> ${s.side} side</div>
+        <div class="sched-day">${s.day}</div>
+        <div class="sched-time">${s.fromTime} – ${s.toTime}</div>
+      </div>`).join('');
+    resultsEl.innerHTML = `
+      <div class="schedule-cards">${cardsHtml}</div>
+      <div class="subscribe-section">
+        <h3>Get reminded 1 hour before a street cleaning</h3>
+        <p>We'll ping you automatically before every street cleaning.</p>
+        <input id="contact-input" class="contact-input" type="text" placeholder="e.g. (415) 555-0123 or clawonvacation@gmail.com" autocomplete="off">
+        <button class="sub-btn" onclick="subscribe()">Remind Me</button>
+        <div id="sub-result"></div>
+        <p class="sub-legal">Your contact info is used only to send you reminders. We will never sell your data. Reply STOP or click unsubscribe to cancel anytime.</p>
+      </div>`;
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function nextSweepText(schedule) {
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const today = new Date();
+    const todayIdx = today.getDay();
+
+    let soonest = null;
+    let daysUntil = 99;
+
+    schedule.forEach(s => {
+      const dayIdx = days.indexOf(s.day);
+      if (dayIdx === -1) return;
+      let diff = dayIdx - todayIdx;
+      if (diff < 0) diff += 7;
+      if (diff === 0) diff = 7; // already past if same day (simplified)
+      if (diff < daysUntil) {
+        daysUntil = diff;
+        soonest = s;
+      }
+    });
+
+    if (!soonest) return null;
+    if (daysUntil === 0) return `<strong>TODAY</strong> — ${soonest.fromTime} to ${soonest.toTime} (${soonest.side} side)`;
+    if (daysUntil === 1) return `<strong>TOMORROW</strong> — ${soonest.day}, ${soonest.fromTime} to ${soonest.toTime} (${soonest.side} side)`;
+    return `<strong>In ${daysUntil} days</strong> — ${soonest.day}, ${soonest.fromTime} to ${soonest.toTime} (${soonest.side} side)`;
+  }
+
+  async function lookup() {
+    const address = document.getElementById('address-input').value.trim();
+    if (!address) return;
+
+    const btn = document.getElementById('lookup-btn');
+    btn.disabled = true;
+    btn.textContent = 'Looking up...';
+
+    try {
+      const res = await fetch(`/api/lookup?address=${encodeURIComponent(address)}`);
+      const data = await res.json();
+
+      const resultsEl = document.getElementById('results');
+      const howEl = document.getElementById('how-it-works');
+      resultsEl.style.display = 'block';
+      howEl.style.display = 'none';
+
+      if (data.error) {
+        resultsEl.innerHTML = `
+          <div class="not-found">
+            <p>⚠️ ${data.error}</p>
+          </div>`;
+        return;
+      }
+
+      // Multiple locations — show picker
+      if (data.candidates) {
+        resultsEl.innerHTML = `
+          <div class="picker-label">We found a few spots — which one?</div>
+          <div class="picker-list">
+            ${data.candidates.map(c => `
+              <button class="picker-btn" onclick="pickLocation('${encodeURIComponent(c.street)}', '${encodeURIComponent(c.matched)}', ${c.isBusiness})">
+                <span class="picker-name">${c.label}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            `).join('')}
+          </div>`;
+        return;
+      }
+
+      currentStreet = data.street;
+      currentAddress = data.matched;
+
+      if (!data.found || !data.schedule) {
+        resultsEl.innerHTML = `
+          <div class="not-found">
+            <p>We don't have the sweeping schedule for <strong>${data.street}</strong> yet.<br><br>
+            SF sweeps <a href="https://sfpublicworks.org/services/mechanical-street-sweeping-and-street-cleaning-schedule" target="_blank">90% of streets</a> — check the official SF Public Works map for your exact schedule, or <a href="mailto:clawonvacation@gmail.com?subject=Add%20my%20street%20to%20Don't%20Get%20Swept&body=Please%20add%20${encodeURIComponent(data.street)}%20to%20the%20database.">email us</a> and we'll add it.</p>
+          </div>`;
+        return;
+      }
+
+      const cardsHtml = data.schedule.map(s => `
+        <div class="sched-card">
+          <div class="sched-side">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            ${s.side} side
+          </div>
+          <div class="sched-day">${s.day}</div>
+          <div class="sched-time">${s.fromTime} – ${s.toTime}</div>
+        </div>
+      `).join('');
+
+      resultsEl.innerHTML = `
+        ${data.isBusiness && data.matched ? `<p class="result-address">${data.matched}</p>` : ''}
+        <div class="schedule-cards">${cardsHtml}</div>
+
+        <div class="subscribe-section">
+          <h3>Get reminded 1 hour before a street cleaning</h3>
+          <p>We'll ping you automatically before every street cleaning.</p>
+
+          <input
+            id="contact-input"
+            class="contact-input"
+            type="text"
+            placeholder="e.g. (415) 555-0123 or clawonvacation@gmail.com"
+            autocomplete="off"
+          >
+
+          <button class="sub-btn" onclick="subscribe()">Remind Me</button>
+          <div id="sub-result"></div>
+          <p class="sub-legal">Your contact info is used only to send you reminders. We will never sell your data. Reply STOP or click unsubscribe to cancel anytime.</p>
+        </div>
+      `;
+
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (e) {
+      document.getElementById('results').innerHTML = `<div class="not-found"><p>Something went wrong. Please try again.</p></div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Look Up';
+    }
+  }
+
+  async function subscribe() {
+    const contact = document.getElementById('contact-input').value.trim();
+    if (!contact) {
+      alert('Please enter your phone number or email.');
+      return;
+    }
+
+    const btn = document.querySelector('.sub-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          street: currentStreet,
+          address: currentAddress,
+          contact,
+          type: contact.includes('@') ? 'email' : 'sms'
+        })
+      });
+      const data = await res.json();
+
+      const resultEl = document.getElementById('sub-result');
+      if (data.success) {
+        resultEl.innerHTML = `<div class="sub-success" style="margin-top:14px">
+          ✓ You're on the list! We'll remind you before every street cleaning on ${currentStreet}.
+        </div>`;
+        btn.style.display = 'none';
+      } else {
+        resultEl.innerHTML = `<p style="color:var(--red);font-size:13px;margin-top:8px">⚠️ ${data.error}</p>`;
+        btn.disabled = false;
+        btn.textContent = 'Remind Me';
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Remind Me';
+    }
+  }
+</script>
+</body>
+</html>
